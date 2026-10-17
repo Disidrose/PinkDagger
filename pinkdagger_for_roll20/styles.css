@@ -1,0 +1,777 @@
+.dh-container {
+    background-color: #12141c;
+    color: #e2e8f0;
+    padding: 16px;
+    font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 8px;
+    border: 2px solid #3c4252;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
+}
+
+.dh-title-bar {
+    border-bottom: 2px solid #5a657d;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-title-bar h2 {
+    margin: 0;
+    color: #E85D9E;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.3em;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.dh-header-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9em;
+    color: #cbd5e0;
+    font-weight: 600;
+}
+
+.dh-header-meta span strong {
+    color: #f1c40f;
+}
+
+/* Seções com Título e Botão de Adicionar */
+.dh-section-title {
+    background: #1e2230;
+    color: #E85D9E;
+    font-size: 0.9em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid #E85D9E;
+    border-radius: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-add-btn {
+    background: #12141c;
+    color: #E85D9E;
+    border: 1px solid #E85D9E;
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.dh-add-btn:hover {
+    background: #E85D9E;
+    color: #12141c;
+    transform: scale(1.08);
+}
+
+/* Botão de adicionar atributo ausente */
+.dh-add-missing-btn {
+    background: #12141c;
+    color: #f1c40f;
+    border: 1px dashed #f1c40f;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.85em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-add-missing-btn:hover {
+    background: #f1c40f;
+    color: #12141c;
+}
+
+/* Grid de Atributos Principais (Botões Clicáveis) */
+.dh-traits-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dh-trait-card {
+    background: #1b1f2b;
+    border: 1px solid #4a5568;
+    border-radius: 6px;
+    padding: 8px 4px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-trait-card:hover {
+    background: #252b3b;
+    border-color: #f1c40f;
+    transform: translateY(-2px);
+}
+
+.dh-trait-name {
+    font-size: 0.6em;
+    text-transform: uppercase;
+    color: #a0aec0;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.dh-trait-val {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 2px;
+}
+
+/* Recursos Principais Fixos (Compactos) */
+.dh-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dh-stat-box {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dh-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-stat-label {
+    font-size: 0.75em;
+    color: #cbd5e0;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dh-stat-value {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+/* Bolinhas de Rastreio menores */
+.dh-dots-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.dh-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #4a5568;
+    transition: all 0.2s ease;
+}
+
+.dh-dot.vida.active { background-color: #2ecc71; border-color: #27ae60; box-shadow: 0 0 4px #2ecc71; }
+.dh-dot.fadiga.active { background-color: #e74c3c; border-color: #c0392b; box-shadow: 0 0 4px #e74c3c; }
+.dh-dot.armadura.active { background-color: #95a5a6; border-color: #7f8c8d; box-shadow: 0 0 4px #95a5a6; }
+.dh-dot.esperança.active { background-color: #f1c40f; border-color: #f39c12; box-shadow: 0 0 4px #f1c40f; }
+
+.dh-dot.inactive {
+    background-color: #111318;
+    border-color: #2d3748;
+}
+
+/* Layout lado a lado: Defesas (30%) + Experiências (70%) */
+.dh-top-row-grid {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    gap: 12px;
+    margin-bottom: 15px;
+    align-items: stretch;
+}
+
+/* Bloco Unificado: Evasão + Limiares */
+.dh-defenses-box {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.dh-defenses-header {
+    font-size: 0.75em;
+    color: #cbd5e0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-defenses-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.dh-defense-row-full {
+    width: 100%;
+}
+
+.dh-defense-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.dh-defense-item {
+    background: #12141c;
+    border: 1px solid #2d3748;
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-defense-sublabel {
+    font-size: 0.7em;
+    color: #a0aec0;
+    text-transform: uppercase;
+}
+
+.dh-defense-val {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+/* Bloco de Experiências (1 por linha) */
+.dh-experiences-box {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.dh-experiences-header {
+    font-size: 0.75em;
+    color: #cbd5e0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-experiences-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+
+.dh-exp-card {
+    background: #12141c;
+    border: 1px solid #2d3748;
+    border-radius: 4px;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-exp-card:hover {
+    background: #1e2230;
+    border-color: #f1c40f;
+    transform: translateY(-1px);
+}
+
+.dh-exp-name {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-exp-mod {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+/* Outros Atributos Personalizados */
+.dh-others-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.dh-other-box {
+    background: #171a23;
+    border: 1px solid #3c4252;
+    border-radius: 4px;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85em;
+}
+
+.dh-spinner-group {
+    display: flex;
+    align-items: center;
+    background: #171a23;
+    border: 1px solid #3c4252;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dh-spinner-input {
+    border: 1px solid #4a5568;
+    color: #12141c;
+    font-weight: bold;
+    text-align: center;
+    width: 45px;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.dh-spinner-btns {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #3c4252;
+}
+
+.dh-spin-btn {
+    background: #1b1f2b;
+    color: #a0aec0;
+    border: none;
+    font-size: 7px;
+    padding: 2px 5px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.dh-spin-btn:hover {
+    background: #f1c40f;
+    color: #12141c;
+}
+
+/* Seções de Cards (Herança/Classe) */
+.dh-heritage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.dh-heritage-card {
+    background: #1b1f2b;
+    border: 1px solid #3c485e;
+    border-top: 3px solid #3498db;
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-heritage-card:hover {
+    background: #232a38;
+    border-color: #f1c40f;
+    transform: translateY(-2px);
+}
+
+.dh-heritage-tag {
+    font-size: 0.7em;
+    color: #3498db;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-heritage-title {
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed #3c4252;
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+}
+
+.dh-heritage-effect {
+    font-size: 0.82em;
+    color: #cbd5e0;
+    line-height: 1.35;
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.dh-heritage-effect-name {
+    color: #f1c40f;
+    font-weight: bold;
+    display: inline;
+    margin-right: 4px;
+}
+
+/* Seção Passando de Nível (lvl_) */
+.dh-level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.dh-level-card {
+    background: #1b1f2b;
+    border: 1px solid #3c485e;
+    border-top: 3px solid #f1c40f;
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+    cursor: default;
+}
+
+.dh-level-title {
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed #3c4252;
+    padding-bottom: 6px;
+}
+
+.dh-level-block {
+    font-size: 0.82em;
+    color: #cbd5e0;
+    line-height: 1.4;
+}
+
+.dh-level-block-name {
+    color: #f1c40f;
+    font-weight: bold;
+    margin-bottom: 2px;
+    display: block;
+}
+
+.dh-level-block-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.dh-level-checkbox {
+    accent-color: #f1c40f;
+    margin-right: 6px;
+    cursor: pointer;
+    transform: scale(1.1);
+    vertical-align: middle;
+}
+
+/* Seção de Armas (wea_) */
+.dh-weapons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.dh-weapon-card {
+    background: #1b1f2b;
+    border: 1px solid #3a4b5c;
+    border-top: 3px solid #e74c3c;
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-weapon-card:hover {
+    background: #232a38;
+    border-color: #e74c3c;
+    transform: translateY(-2px);
+}
+
+.dh-weapon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-weapon-trait-tag {
+    font-size: 0.7em;
+    font-weight: 800;
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-weapon-damage-tag {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #f1c40f;
+    background: #12141c;
+    border: 1px solid #3c4252;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.dh-weapon-title {
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed #3c4252;
+    padding-bottom: 6px;
+}
+
+.dh-weapon-desc {
+    font-size: 0.82em;
+    color: #cbd5e0;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-top: 2px;
+}
+
+/* Seção de Cartas de Domínio Clicáveis (3 por linha) */
+.dh-domains-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.dh-domain-card {
+    background: #1b1f2b;
+    border: 1px solid #5a4730;
+    border-top: 3px solid #c89d54;
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 130px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-domain-card:hover {
+    background: #232836;
+    border-color: #f1c40f;
+    border-top-color: #f1c40f;
+    transform: translateY(-2px);
+}
+
+.dh-domain-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75em;
+    color: #cbd5e0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.dh-domain-name {
+    text-align: center;
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed #3c4252;
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+}
+
+.dh-domain-desc {
+    text-align: left;
+    font-size: 0.82em;
+    color: #cbd5e0;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Seção de Inventário e Moedas */
+.dh-inventory-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.dh-inventory-textbox {
+    background: #171a23;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+.dh-inventory-label {
+    font-size: 0.75em;
+    color: #cbd5e0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.dh-inventory-textarea {
+    background: #12141c;
+    border: 1px solid #2d3748;
+    color: #e2e8f0;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 0.85em;
+    resize: vertical;
+    min-height: 110px;
+    outline: none;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    box-sizing: border-box;
+    width: calc(100% - 6px);
+}
+
+.dh-inventory-textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dh-inventory-textarea::-webkit-scrollbar-track {
+    background: #12141c;
+    border-radius: 3px;
+}
+
+.dh-inventory-textarea::-webkit-scrollbar-thumb {
+    background: #3c4252;
+    border-radius: 3px;
+}
+
+.dh-inventory-textarea::-webkit-scrollbar-thumb:hover {
+    background: #E85D9E;
+}
+
+.dh-inventory-textarea:focus {
+    border-color: #E85D9E;
+}
+
+.dh-money-box {
+    background: #171a23;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dh-money-item {
+    background: #1b1f2b;
+    border: 1px solid #2d3748;
+    border-radius: 4px;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-money-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #f1c40f;
+    text-transform: uppercase;
+}
+
+/* Outros Macros Clicáveis */
+.dh-abilities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dh-ability-item {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 5px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    color: #e2e8f0;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-ability-item:hover {
+    background: #232a38;
+    border-color: #f1c40f;
+    transform: translateY(-1px);
+}
+
+.dh-ability-item::before {
+    content: "◆";
+    color: #f1c40f;
+    margin-right: 8px;
+    font-size: 0.75em;
+}

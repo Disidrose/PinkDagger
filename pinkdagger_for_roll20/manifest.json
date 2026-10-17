@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "PinkDagger for Roll20",
+  "version": "0.1.0",
+  "description": "Interface customizada e interativa para fichas de Daggerheart no Roll20.",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.roll20.net/editor*",
+        "https://app.roll20.net/editor/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "styles.css"
+      ],
+      "matches": [
+        "https://app.roll20.net/*"
+      ]
+    }
+  ]
+}
