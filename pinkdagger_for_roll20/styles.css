@@ -80,6 +80,287 @@
     transform: scale(1.08);
 }
 
+/* Variante de botão com + e label em duas linhas */
+.dh-add-btn--labeled {
+    flex-direction: column;
+    width: auto;
+    height: auto;
+    padding: 3px 7px;
+    gap: 1px;
+    line-height: 1;
+}
+
+.dh-add-btn-plus {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.dh-add-btn-label {
+    font-size: 0.52em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
+/* Botão de Editar no Card de Arma */
+.dh-weapon-edit-btn {
+    background: #12141c;
+    border: 1px solid #3c4252;
+    color: #a0aec0;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+    padding: 0;
+    border-radius: 4px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.dh-weapon-edit-btn:hover {
+    border-color: #E85D9E;
+    color: #E85D9E;
+    background: #1e2230;
+    transform: scale(1.08);
+}
+
+/* Header e Botão de Editar nos Cards de Herança e Classe */
+.dh-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-card-edit-btn {
+    background: #12141c;
+    border: 1px solid #3c4252;
+    color: #a0aec0;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+    padding: 0;
+    border-radius: 4px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.dh-card-edit-btn:hover {
+    border-color: #E85D9E;
+    color: #E85D9E;
+    background: #1e2230;
+    transform: scale(1.08);
+}
+
+/* Modal de Edição (Armas, Cartas e outros) */
+.dh-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+}
+
+.dh-modal-box {
+    background: #171a23;
+    border: 2px solid #E85D9E;
+    border-radius: 8px;
+    padding: 18px 20px;
+    width: 90%;
+    max-width: 480px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+
+/* Lista de Efeitos Dinâmicos no Modal de Carta */
+.dh-effects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.dh-effects-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dh-effects-container::-webkit-scrollbar-thumb {
+    background: #3c4252;
+    border-radius: 3px;
+}
+
+.dh-effect-item {
+    background: #12141c;
+    border: 1px solid #2d3748;
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dh-effect-item-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dh-effect-key-input {
+    flex-grow: 1;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+.dh-effect-remove-btn {
+    background: #1e2230;
+    border: 1px solid #4a5568;
+    color: #e53e3e;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 0.8em;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.dh-effect-remove-btn:hover {
+    background: #e53e3e;
+    color: #fff;
+    border-color: #e53e3e;
+}
+
+.dh-add-effect-btn {
+    background: #1b1f2b;
+    border: 1px dashed #E85D9E;
+    color: #E85D9E;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+}
+
+.dh-add-effect-btn:hover {
+    background: #E85D9E;
+    color: #12141c;
+}
+
+
+.dh-modal-title {
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #E85D9E;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #3c4252;
+    padding-bottom: 8px;
+    margin: 0;
+}
+
+.dh-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dh-modal-field label {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #cbd5e0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-modal-input, .dh-modal-select, .dh-modal-textarea {
+    background: #12141c;
+    border: 1px solid #3c4252;
+    border-radius: 4px;
+    color: #f1c40f;
+    font-size: 0.85em;
+    padding: 7px 10px;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.dh-modal-input:focus, .dh-modal-select:focus, .dh-modal-textarea:focus {
+    border-color: #E85D9E;
+}
+
+.dh-modal-textarea {
+    resize: vertical;
+    min-height: 70px;
+    line-height: 1.4;
+}
+
+.dh-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.dh-modal-btn {
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dh-modal-btn-cancel {
+    background: #2d3748;
+    color: #cbd5e0;
+    border: 1px solid #4a5568;
+}
+
+.dh-modal-btn-cancel:hover {
+    background: #4a5568;
+    color: #fff;
+}
+
+.dh-modal-btn-save {
+    background: #E85D9E;
+    color: #12141c;
+    border: 1px solid #E85D9E;
+}
+
+.dh-modal-btn-save:hover {
+    background: #ff75b5;
+    transform: scale(1.03);
+}
+
+
+
 /* Botão de adicionar atributo ausente */
 .dh-add-missing-btn {
     background: #12141c;
@@ -269,6 +550,38 @@
     font-size: 0.95em;
     font-weight: bold;
     color: #f1c40f;
+    min-width: 24px;
+    text-align: center;
+}
+
+.dh-defense-value-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dh-defense-spin-btn {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    color: #a0aec0;
+    width: 15px;
+    height: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.dh-defense-spin-btn:hover {
+    background: #f1c40f;
+    color: #12141c;
+    border-color: #f1c40f;
 }
 
 /* Bloco de Experiências (1 por linha) */
@@ -334,13 +647,20 @@
     color: #f1c40f;
 }
 
-/* Outros Atributos Personalizados */
-.dh-others-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+/* Recursos Personalizados — aparecem após Defesas e Experiências */
+.dh-custom-stats-grid {
+    margin-top: 0;
     margin-bottom: 15px;
 }
+
+.dh-custom-stat-box {
+    border-color: #2d3748;
+}
+
+.dh-custom-stat-label {
+    color: #a0aec0;
+}
+
 
 .dh-other-box {
     background: #171a23;
@@ -621,6 +941,7 @@
 .dh-domain-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 0.75em;
     color: #cbd5e0;
     font-weight: bold;
