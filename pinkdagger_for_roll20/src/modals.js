@@ -421,3 +421,115 @@ function saveDomainChanges(doc, abilIdx, rawName, newName, newNivel, newCusto, n
 }
 
 
+
+
+function openImportNpcModal(doc) {
+    const existingModal = doc.getElementById('dh-import-npc-modal');
+    if (existingModal) existingModal.remove();
+
+    const modalOverlay = doc.createElement('div');
+    modalOverlay.id = 'dh-import-npc-modal';
+    modalOverlay.className = 'dh-modal-overlay';
+
+    modalOverlay.innerHTML = `
+        <div class="dh-modal-box dh-import-npc-modal-box">
+            <h3 class="dh-modal-title">🐉 Importar Ficha de Monstro / NPC</h3>
+            <div style="font-size: 0.85em; color: #cbd5e0; line-height: 1.4;">
+                Copie o texto da ficha diretamente do livro/PDF de Daggerheart (<kbd>Ctrl+C</kbd>) e cole abaixo (<kbd>Ctrl+V</kbd>).
+                O parser irá identificar automaticamente <strong>Nome, Tipo, Tier, Descrição, Motivações, Atributos, Ataque, Experiências</strong> e todas as <strong>Habilidades</strong>!
+            </div>
+            
+            <div class="dh-modal-field" style="margin-top: 6px;">
+                <label>Texto da Ficha (Livro ou PDF):</label>
+                <textarea class="dh-modal-textarea dh-import-textarea" id="dh-import-npc-text" rows="12" placeholder="Exemplo:
+EXALTADO, SOLDADO
+Lacaio (4º patamar)
+Almas de fiéis abençoados com armamento divino.
+Motivações e táticas: aglomerar, obedecer, manobrar melhor, punir
+Dificuldade: 18 | Limiar: nenhum | 1 PV | 2 PF
+ATQ: +2 | Espada e escudo: corpo a corpo | 10 fís
+HABILIDADES
+Lacaio (13) (passiva): o soldado é derrotado..."></textarea>
+            </div>
+
+            <div id="dh-import-status" style="font-size: 0.84em; color: #f1c40f; font-weight: bold; min-height: 20px;"></div>
+
+            <div class="dh-modal-actions" style="justify-content: space-between; align-items: center; margin-top: 8px;">
+                <button type="button" class="dh-modal-btn dh-modal-btn-cancel" id="dh-import-blank-btn" title="Criar ficha de NPC vazia para preencher manualmente">Criar em Branco</button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="dh-modal-btn dh-modal-btn-cancel" id="dh-import-cancel-btn">Cancelar</button>
+                    <button type="button" class="dh-modal-btn dh-modal-btn-save" id="dh-import-confirm-btn">🪄 Importar e Preencher</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    doc.body.appendChild(modalOverlay);
+
+    const closeModal = () => modalOverlay.remove();
+    const cancelBtn = modalOverlay.querySelector('#dh-import-cancel-btn');
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Criar em branco (sem importar)
+    const blankBtn = modalOverlay.querySelector('#dh-import-blank-btn');
+    if (blankBtn) {
+        blankBtn.addEventListener('click', () => {
+            closeModal();
+            addNewAttributeToRoll20(doc, 'pinkdagger_npc', null, '1', false, false, true);
+        });
+    }
+
+    // Importar e preencher
+    const confirmBtn = modalOverlay.querySelector('#dh-import-confirm-btn');
+    const textarea = modalOverlay.querySelector('#dh-import-npc-text');
+    const statusElem = modalOverlay.querySelector('#dh-import-status');
+
+    if (confirmBtn && textarea) {
+        confirmBtn.addEventListener('click', async () => {
+            const rawText = textarea.value.trim();
+            if (!rawText) {
+                if (statusElem) {
+                    statusElem.style.color = '#e74c3c';
+                    statusElem.innerText = 'Cole o texto da ficha copiado do livro antes de importar.';
+                }
+                return;
+            }
+
+            const parsed = parseNpcBookText(rawText);
+            if (!parsed || (!parsed.tipo && !parsed.dificuldade && !parsed.atq)) {
+                if (statusElem) {
+                    statusElem.style.color = '#e74c3c';
+                    statusElem.innerText = 'Não foi possível reconhecer o formato da ficha. Verifique se o texto copiado inclui Tipo/Patamar, Dificuldade ou Ataque.';
+                }
+                return;
+            }
+
+            confirmBtn.disabled = true;
+            if (cancelBtn) cancelBtn.disabled = true;
+            if (blankBtn) blankBtn.disabled = true;
+            textarea.disabled = true;
+
+            if (statusElem) {
+                statusElem.style.color = '#f1c40f';
+                statusElem.innerText = 'Iniciando importação para o Roll20...';
+            }
+
+            try {
+                await importNpcBatchToRoll20(doc, parsed, (msg) => {
+                    if (statusElem) statusElem.innerText = msg;
+                });
+                closeModal();
+            } catch (err) {
+                console.error('Erro na importação de NPC:', err);
+                if (statusElem) {
+                    statusElem.style.color = '#e74c3c';
+                    statusElem.innerText = 'Ocorreu um erro durante a importação. Verifique o console.';
+                }
+                confirmBtn.disabled = false;
+                if (cancelBtn) cancelBtn.disabled = false;
+                if (blankBtn) blankBtn.disabled = false;
+                textarea.disabled = false;
+            }
+        });
+    }
+}

@@ -157,7 +157,7 @@ function addNewMacroToRoll20(doc, prefix, promptMessage, customFullName = null) 
     }, 150);
 }
 
-function addNewAttributeToRoll20(doc, attrName, promptMessage, defaultVal = "0", hasMax = false, isPrincipalTrait = false) {
+function addNewAttributeToRoll20(doc, attrName, promptMessage, defaultVal = "0", hasMax = false, isPrincipalTrait = false, skipPrompt = false) {
     const navTabs = doc.querySelector('.nav.nav-tabs');
     if (!navTabs) return;
 
@@ -179,13 +179,15 @@ function addNewAttributeToRoll20(doc, attrName, promptMessage, defaultVal = "0",
             resolvedAttrName = resolvedAttrName.trim();
         }
 
-        const userVal = prompt(`Valor inicial para ${resolvedAttrName}:`, defaultVal);
-        if (userVal === null) {
-            if (pinkDaggerNav) pinkDaggerNav.click();
-            return;
+        let cleanVal = defaultVal;
+        if (!skipPrompt) {
+            const userVal = prompt(`Valor inicial para ${resolvedAttrName}:`, defaultVal);
+            if (userVal === null) {
+                if (pinkDaggerNav) pinkDaggerNav.click();
+                return;
+            }
+            cleanVal = userVal.trim() || defaultVal;
         }
-
-        const cleanVal = userVal.trim() || defaultVal;
 
         const addAttribBtn = doc.querySelector('.attributesabilities .addattrib') || doc.querySelector('.addattrib');
         if (!addAttribBtn) {
@@ -242,5 +244,170 @@ function addNewAttributeToRoll20(doc, attrName, promptMessage, defaultVal = "0",
             }
         }, 200);
     }, 150);
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function importNpcBatchToRoll20(doc, parsedData, onProgress) {
+    const navTabs = doc.querySelector('.nav.nav-tabs');
+    if (!navTabs) return;
+
+    const attrTabNav = navTabs.querySelector('a[data-tab="attributesabilities"]');
+    const pinkDaggerNav = navTabs.querySelector('a[data-tab="daggerheart"]');
+    if (!attrTabNav) return;
+
+    // Atualiza o nome do personagem se detectado no livro
+    if (parsedData.name) {
+        const charNameInput = doc.querySelector('input.name');
+        if (charNameInput && (!charNameInput.value || charNameInput.value.trim() === '' || charNameInput.value.trim().toLowerCase() === 'personagem sem nome')) {
+            charNameInput.value = parsedData.name;
+            charNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            charNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+            charNameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+        }
+    }
+
+    if (onProgress) onProgress('Acessando dados no Roll20...');
+    attrTabNav.click();
+    await delay(200);
+
+    // Lista de atributos a criar
+    const attributesToCreate = [
+        { name: 'pinkdagger_npc', current: '1', hasMax: false },
+        { name: 'Tipo', current: parsedData.tipo || 'Solo', hasMax: false },
+        { name: 'Tier', current: parsedData.tier || '1', hasMax: false },
+        { name: 'Flavor', current: parsedData.flavor || '', hasMax: false },
+        { name: 'Motiv_Tatic', current: parsedData.motiv_tatic || '', hasMax: false },
+        { name: 'Dificuldade', current: parsedData.dificuldade || '10', hasMax: false },
+        { name: 'Limiares', current: parsedData.limiares || 'Nenhum', hasMax: false },
+        { name: 'Vida', current: parsedData.vida || '1', max: parsedData.vida || '1', hasMax: true },
+        { name: 'Fadiga', current: parsedData.fadiga || '1', max: parsedData.fadiga || '1', hasMax: true },
+        { name: 'Atq', current: parsedData.atq || '0', hasMax: false },
+        { name: 'Nome_Ataque', current: parsedData.nome_ataque || 'Ataque', hasMax: false },
+        { name: 'Alcance', current: parsedData.alcance || 'corpo a corpo', hasMax: false },
+        { name: 'Dano', current: parsedData.dano || '1d6', hasMax: false },
+        { name: 'Tipo_Dano', current: parsedData.tipo_dano || 'fís', hasMax: false }
+    ];
+
+    // Se limiares vier no formato 29/55, também grava limiar-menor e limiar-maior para compatibilidade
+    if (parsedData.limiares && parsedData.limiares.includes('/')) {
+        const parts = parsedData.limiares.split('/');
+        attributesToCreate.push({ name: 'Limiar-Menor', current: parts[0].trim(), hasMax: false });
+        attributesToCreate.push({ name: 'Limiar-Maior', current: parts[1].trim(), hasMax: false });
+    }
+
+    // 1. Criar atributos
+    for (let i = 0; i < attributesToCreate.length; i++) {
+        const attr = attributesToCreate[i];
+        if (onProgress) onProgress(`Cadastrando atributo ${attr.name} (${i + 1}/${attributesToCreate.length})...`);
+
+        const addAttribBtn = doc.querySelector('.attributesabilities .addattrib') || doc.querySelector('.addattrib');
+        if (!addAttribBtn) continue;
+        addAttribBtn.click();
+        await delay(120);
+
+        const attribs = doc.querySelectorAll('.attributesabilities .attributes .attrib');
+        const newAttrib = attribs[attribs.length - 1];
+        if (newAttrib) {
+            const nameInput = newAttrib.querySelector('.attrname input') || newAttrib.querySelector('.attrname');
+            const currentInput = newAttrib.querySelector('.current input');
+            const maxInput = newAttrib.querySelector('.max input');
+
+            if (nameInput) {
+                if (nameInput.tagName.toLowerCase() === 'input') nameInput.value = attr.name;
+                else nameInput.innerText = attr.name;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            if (currentInput) {
+                currentInput.value = attr.current;
+                currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+                currentInput.dispatchEvent(new Event('change', { bubbles: true }));
+                currentInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            if (maxInput && attr.hasMax) {
+                maxInput.value = attr.max || attr.current;
+                maxInput.dispatchEvent(new Event('input', { bubbles: true }));
+                maxInput.dispatchEvent(new Event('change', { bubbles: true }));
+                maxInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+        }
+    }
+
+    // 2. Lista de macros a criar
+    const abilitiesToCreate = [];
+
+    // Macro de Ataque
+    abilitiesToCreate.push({
+        name: 'Ataque',
+        action: `&{template:default} {{name=@{nome_ataque}\n}} {{Ataque=[[d20+@{atq}]]\n}} {{Alcance=@{alcance}\n}} {{Dano=[[@{dano}]] @{tipo_dano}\n}}`
+    });
+
+    // Macros de Experiências
+    if (parsedData.experiencias && parsedData.experiencias.length > 0) {
+        parsedData.experiencias.forEach(exp => {
+            abilitiesToCreate.push({
+                name: `exp_${exp.name}`,
+                action: `&{template:default} {{name=${exp.name}\n}} {{Modificador=${exp.mod}\n}}`
+            });
+        });
+    }
+
+    // Macros de Habilidades
+    if (parsedData.habilidades && parsedData.habilidades.length > 0) {
+        parsedData.habilidades.forEach(hab => {
+            abilitiesToCreate.push({
+                name: `hab_${hab.name}`,
+                action: `&{template:default} {{name=${hab.name}\n}} {{Efeito=${hab.desc}\n}}`
+            });
+        });
+    }
+
+    // Criar macros
+    for (let i = 0; i < abilitiesToCreate.length; i++) {
+        const abil = abilitiesToCreate[i];
+        if (onProgress) onProgress(`Cadastrando macro ${abil.name} (${i + 1}/${abilitiesToCreate.length})...`);
+
+        const addAbilBtn = doc.querySelector('.attributesabilities .addabil') || doc.querySelector('.addabil');
+        if (!addAbilBtn) continue;
+        addAbilBtn.click();
+        await delay(150);
+
+        const abils = doc.querySelectorAll('.attributesabilities .abilities .abil');
+        const newAbil = abils[abils.length - 1];
+        if (newAbil) {
+            const editBtn = newAbil.querySelector('.editabil');
+            if (editBtn) editBtn.click();
+            await delay(120);
+
+            const nameInput = newAbil.querySelector('.abilname input') || newAbil.querySelector('input.abilname');
+            const macroTextarea = newAbil.querySelector('textarea.action') || newAbil.querySelector('textarea');
+
+            if (nameInput) {
+                nameInput.value = abil.name;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            if (macroTextarea) {
+                macroTextarea.value = abil.action;
+                macroTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                macroTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+                macroTextarea.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+
+            const saveBtn = newAbil.querySelector('.saveabil');
+            if (saveBtn) saveBtn.click();
+            await delay(120);
+        }
+    }
+
+    if (onProgress) onProgress('Finalizando importação...');
+    await delay(250);
+    if (pinkDaggerNav) pinkDaggerNav.click();
+    populateDaggerheartData(doc);
 }
 

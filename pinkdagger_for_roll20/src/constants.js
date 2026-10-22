@@ -8,7 +8,9 @@ const MACRO_TEMPLATES = {
     wea: `#Atributo-Agilidade &{template:default} {{name=Nome da Arma\n}} {{dano=[[@{proficiência}d8 + 0]]\n}} {{desc=<OPCIONAL> Efeito crítico ou alcance.\n}}`,
     dom: `&{template:default} {{name=Nome da Carta\n}} {{Nível=1\n}} {{Custo=0\n}} {{Descrição=O que a carta de domínio faz.\n}}`,
     exp: `&{template:default} {{name=Nome da Experiência\n}} {{Modificador=+2\n}}`,
-    inv: `Itens:`
+    inv: `Itens:`,
+    ataque: `&{template:default} {{name=Ataque\n}} {{Ataque=[[d20+@{atq}]]\n}} {{Dano=[[@{dano}]] @{tipo_dano}\n}}`,
+    hab: `&{template:default} {{name=Nome da Habilidade\n}} {{Efeito=O que a habilidade faz.\n}}`
 };
 
 // Atributos principais e recursos/trackers fixos do sistema Daggerheart

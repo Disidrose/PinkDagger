@@ -93,6 +93,21 @@ function populateDaggerheartData(doc) {
     };
     let nivelVal = null;
     let profVal = null;
+    let isNpc = false;
+    let isPc = false;
+    let npcStats = { 
+        dificuldade: { val: '-', exists: false }, 
+        atq: { val: '-', exists: false }, 
+        alcance: { val: '-', exists: false }, 
+        dano: { val: '-', exists: false }, 
+        tipo_dano: { val: '', exists: false },
+        nome_ataque: { val: '', exists: false },
+        limiares: { val: '', exists: false },
+        tipo: { val: '', exists: false },
+        tier: { val: '-', exists: false },
+        description: { val: '', exists: false },
+        motiv_tatic: { val: '', exists: false }
+    };
 
     attributeElements.forEach(attr => {
         const nameElem = attr.querySelector('.attrname');
@@ -131,10 +146,455 @@ function populateDaggerheartData(doc) {
             moneyMap.bolsa = { val: parseInt(currentVal, 10) || 0, input: currentInput, exists: true };
         } else if (lowerName === 'baú' || lowerName === 'bau' || lowerName === 'moeda_bau') {
             moneyMap.bau = { val: parseInt(currentVal, 10) || 0, input: currentInput, exists: true };
+        } else if (lowerName === 'pinkdagger_npc') {
+            isNpc = true;
+        } else if (lowerName === 'pinkdagger_pc') {
+            isPc = true;
+        } else if (lowerName === 'dificuldade') {
+            npcStats.dificuldade = { val: currentVal, exists: true };
+        } else if (lowerName === 'limiares' || lowerName === 'limiar') {
+            npcStats.limiares = { val: currentVal, exists: true };
+            if (currentVal && currentVal.includes('/')) {
+                const parts = currentVal.split('/');
+                if (!defenses.menor) defenses.menor = { val: parts[0].trim(), exists: true };
+                if (!defenses.maior) defenses.maior = { val: parts[1].trim(), exists: true };
+            }
+        } else if (lowerName === 'atq' || lowerName === 'ataque') {
+            npcStats.atq = { val: currentVal, exists: true };
+        } else if (lowerName === 'nome_ataque' || lowerName === 'nome-ataque' || lowerName === 'nome ataque' || lowerName === 'arma' || lowerName === 'nome_arma') {
+            npcStats.nome_ataque = { val: currentVal, exists: true };
+        } else if (lowerName === 'alcance') {
+            npcStats.alcance = { val: currentVal, exists: true };
+        } else if (lowerName === 'dano') {
+            npcStats.dano = { val: currentVal, exists: true };
+        } else if (lowerName === 'tipo_dano' || lowerName === 'tipo-dano' || lowerName === 'tipo de dano' || lowerName === 'tipo do dano' || lowerName === 'dano_tipo') {
+            npcStats.tipo_dano = { val: currentVal, exists: true };
+        } else if (lowerName === 'tipo') {
+            npcStats.tipo = { val: currentVal, exists: true };
+        } else if (lowerName === 'tier') {
+            npcStats.tier = { val: currentVal, exists: true };
+        } else if (lowerName === 'flavor' || lowerName === 'description' || lowerName === 'descrição' || lowerName === 'descricao' || lowerName === 'desc') {
+            npcStats.description = { val: currentVal, exists: true };
+        } else if (lowerName === 'motiv_tatic' || lowerName === 'motiv_tatics' || lowerName === 'motivações e táticas' || lowerName === 'motivacoes e taticas' || lowerName === 'motivação e tática' || lowerName === 'motivacao e tatica' || lowerName === 'motivacoes_taticas' || lowerName === 'táticas' || lowerName === 'taticas' || lowerName === 'motivação' || lowerName === 'motivacao') {
+            npcStats.motiv_tatic = { val: currentVal, exists: true };
         } else if (name) {
             unmappedStats.push({ name, current: currentVal, max: maxVal, originalInput: currentInput });
         }
     });
+
+    // ========== NPC SHEET RENDERING ==========
+    if (isNpc) {
+        const headerMeta = doc.querySelector('.dh-header-meta');
+        if (headerMeta) {
+            headerMeta.style.display = 'none';
+        }
+
+        const abilityElements = doc.querySelectorAll('.attributesabilities .abilities .abil');
+
+        // --- Vida e Fadiga (apenas máximas) ---
+        const vidaData = trackersMap['vida'];
+        const fadigaData = trackersMap['fadiga'];
+        const vidaMax = vidaData ? (vidaData.max || vidaData.current || '-') : '-';
+        const fadigaMax = fadigaData ? (fadigaData.max || fadigaData.current || '-') : '-';
+
+        // --- Mapa de atributos para resolução de variáveis nos macros ---
+        const attrMap = {
+            'atq': npcStats.atq.exists ? npcStats.atq.val : '',
+            'ataque': npcStats.atq.exists ? npcStats.atq.val : '',
+            'dano': npcStats.dano.exists ? npcStats.dano.val : '',
+            'damage': npcStats.dano.exists ? npcStats.dano.val : '',
+            'tipo_dano': npcStats.tipo_dano.exists ? npcStats.tipo_dano.val : '',
+            'tipo-dano': npcStats.tipo_dano.exists ? npcStats.tipo_dano.val : '',
+            'dano_tipo': npcStats.tipo_dano.exists ? npcStats.tipo_dano.val : '',
+            'tipo': npcStats.tipo.exists ? npcStats.tipo.val : '',
+            'alcance': npcStats.alcance.exists ? npcStats.alcance.val : '',
+            'proficiência': profVal || '',
+            'proficiencia': profVal || ''
+        };
+
+        // --- 1. FORA DE QUALQUER SEÇÃO (Topo da ficha) ---
+        let tierTipoHTML = '';
+        if (npcStats.tipo.exists && npcStats.tier.exists) {
+            const tNum = parseInt(npcStats.tier.val, 10);
+            const patamarStr = !isNaN(tNum) ? `${tNum}º patamar` : `${npcStats.tier.val}`;
+            tierTipoHTML = `<div class="dh-npc-tier-tipo">${npcStats.tipo.val} (${patamarStr})</div>`;
+        } else {
+            let tierPart = npcStats.tier.exists 
+                ? `Tier ${npcStats.tier.val}` 
+                : `Tier <button class="dh-add-missing-btn" data-missing-npc-attr="tier" data-default="1">+</button>`;
+
+            let tipoPart = npcStats.tipo.exists 
+                ? npcStats.tipo.val 
+                : `<button class="dh-add-missing-btn" data-missing-npc-attr="tipo" data-default="Solo">+ Tipo</button>`;
+
+            tierTipoHTML = `<div class="dh-npc-tier-tipo">${tipoPart} ${tierPart}</div>`;
+        }
+
+        let descPart = npcStats.description.exists 
+            ? `<div class="dh-npc-desc">${formatTextWithNewlines(npcStats.description.val)}</div>`
+            : `<div style="margin: 3px 0;"><button class="dh-add-missing-btn" data-missing-npc-attr="flavor" data-default="">+ Flavor / Descrição</button></div>`;
+
+        let motivPart = npcStats.motiv_tatic.exists 
+            ? `<div class="dh-npc-tactics"><span class="dh-npc-tactics-label">Motivações e táticas:</span> ${formatTextWithNewlines(npcStats.motiv_tatic.val)}</div>`
+            : `<div style="margin: 3px 0;"><button class="dh-add-missing-btn" data-missing-npc-attr="motiv_tatic" data-default="">+ Motivações e táticas</button></div>`;
+
+        let npcHeaderHTML = `
+            <div class="dh-npc-header-info">
+                ${tierTipoHTML}
+                ${descPart}
+                ${motivPart}
+            </div>
+        `;
+
+        // --- 2. Busca de Macros: Arma/Ataque, Experiências e Habilidades ---
+        let attackCardHTML = '';
+        let abilityCardsHTML = '';
+        let expCardsHTML = '';
+        let expCount = 0;
+        let attackMacroFullName = null;
+
+        if (abilityElements.length > 0) {
+            abilityElements.forEach((abil) => {
+                const nameElem = abil.querySelector('.abilname');
+                const rawName = nameElem?.innerText?.trim() || (abil.querySelector('.abilname input')?.value?.trim() || '');
+                const lowerName = rawName.toLowerCase();
+
+                if (rawName.startsWith('=====')) return;
+
+                const macroTextarea = abil.querySelector('textarea, input[name*="action"]');
+                const macroContent = macroTextarea ? macroTextarea.value : '';
+
+                const isAttackMacro = lowerName === 'ataque' || 
+                                     lowerName.startsWith('wea_') || 
+                                     lowerName.startsWith('ataque_') ||
+                                     (npcStats.nome_ataque.exists && lowerName === npcStats.nome_ataque.val.toLowerCase().trim());
+
+                if (isAttackMacro) {
+                    attackMacroFullName = rawName;
+                    const fields = extractMacroFields(macroContent);
+                    const macroNameField = fields['name'] ? formatTextWithNewlines(fields['name']) : '';
+                    const attackTitle = npcStats.nome_ataque.exists 
+                        ? npcStats.nome_ataque.val 
+                        : (macroNameField || (rawName.startsWith('wea_') ? rawName.substring(4).trim() : 'Ataque'));
+                    
+                    // Tradução do dano e tipo_dano usando o helper de resolução de variáveis de macro
+                    const rawDamage = fields['dano'] || fields['damage'] || '';
+                    let resolvedDamage = resolveMacroVariables(rawDamage, attrMap);
+                    if (!resolvedDamage && npcStats.dano.exists) {
+                        resolvedDamage = `${npcStats.dano.val} ${npcStats.tipo_dano.exists ? npcStats.tipo_dano.val : ''}`.trim();
+                    }
+
+                    let damageTagHTML = '';
+                    if (resolvedDamage) {
+                        damageTagHTML = `<span class="dh-weapon-damage-tag">${resolvedDamage}</span>`;
+                    } else {
+                        let missingDmgParts = [];
+                        if (!npcStats.dano.exists) {
+                            missingDmgParts.push(`<button class="dh-add-missing-btn" data-missing-npc-attr="dano" data-default="4d12+15" title="Adicionar Dano">+ Dano</button>`);
+                        }
+                        if (!npcStats.tipo_dano.exists) {
+                            missingDmgParts.push(`<button class="dh-add-missing-btn" data-missing-npc-attr="tipo_dano" data-default="fís" title="Adicionar Tipo de Dano">+ Tipo de Dano</button>`);
+                        }
+                        damageTagHTML = missingDmgParts.join(' ');
+                    }
+
+                    // Tradução do alcance
+                    const rawAlcance = fields['alcance'] || '';
+                    let resolvedAlcance = resolveMacroVariables(rawAlcance, attrMap);
+                    if (!resolvedAlcance) {
+                        resolvedAlcance = npcStats.alcance.exists ? npcStats.alcance.val : '';
+                    }
+                    let alcanceTagHTML = resolvedAlcance 
+                        ? `<span class="dh-weapon-trait-tag">${resolvedAlcance}</span>`
+                        : `<button class="dh-add-missing-btn" data-missing-npc-attr="alcance" data-default="próximo" title="Adicionar Alcance">+ Alcance</button>`;
+
+                    // Bônus de ataque
+                    let atqTagHTML = '';
+                    if (npcStats.atq.exists) {
+                        const valStr = String(npcStats.atq.val).trim();
+                        const prefix = valStr.startsWith('+') || valStr.startsWith('-') ? '' : '+';
+                        atqTagHTML = `<span class="dh-weapon-trait-tag" style="color: #f1c40f; border-color: rgba(241, 196, 15, 0.4); background: rgba(241, 196, 15, 0.15);">ATQ ${prefix}${valStr}</span>`;
+                    } else {
+                        atqTagHTML = `<button class="dh-add-missing-btn" data-missing-npc-attr="atq" data-default="10" title="Adicionar Atributo Atq">+ Atq</button>`;
+                    }
+
+                    attackCardHTML = `
+                        <div class="dh-weapon-card dh-npc-weapon-card" data-card-fullname="${rawName}">
+                            <div class="dh-weapon-header">
+                                ${alcanceTagHTML}
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    ${damageTagHTML}
+                                    ${atqTagHTML}
+                                </div>
+                            </div>
+                            <div class="dh-weapon-title">⚔️ ${attackTitle}</div>
+                        </div>
+                    `;
+                } else if (lowerName.startsWith('exp_')) {
+                    expCount++;
+                    const fields = extractMacroFields(macroContent);
+                    const expName = fields['name'] ? formatTextWithNewlines(fields['name']) : rawName.substring(4).trim();
+                    const expMod = fields['modificador'] || fields['mod'] || '+0';
+
+                    expCardsHTML += `
+                        <div class="dh-exp-card" data-card-fullname="${rawName}">
+                            <span class="dh-exp-name">${expName}</span>
+                            <span class="dh-exp-mod">${expMod}</span>
+                        </div>
+                    `;
+                } else if (lowerName.startsWith('hab_') || lowerName.startsWith('habilidade') || lowerName.startsWith('esp_')) {
+                    const fields = extractMacroFields(macroContent);
+                    const cardTitle = fields['name'] ? formatTextWithNewlines(fields['name']) : rawName.replace(/^hab_/i, '').trim();
+                    let effectsHTML = '';
+
+                    Object.keys(fields).forEach(key => {
+                        if (key !== 'name') {
+                            if (key === '__raw_desc__' || key === 'desc' || key === 'descrição' || key === 'descricao' || key === 'efeito') {
+                                effectsHTML += `<div class="dh-heritage-effect">${formatTextWithNewlines(fields[key])}</div>`;
+                            } else {
+                                const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
+                                effectsHTML += `<div class="dh-heritage-effect"><span class="dh-heritage-effect-name">${formattedKey}:</span>${formatTextWithNewlines(fields[key])}</div>`;
+                            }
+                        }
+                    });
+
+                    abilityCardsHTML += `
+                        <div class="dh-heritage-card dh-npc-ability-card" data-card-fullname="${rawName}">
+                            <div class="dh-heritage-tag">HABILIDADE</div>
+                            <div class="dh-heritage-title">${cardTitle}</div>
+                            ${effectsHTML || '<div class="dh-heritage-effect">Sem descrição informada.</div>'}
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Se não houver macro de ataque criado, mostra botão de adicionar macro
+        if (!attackCardHTML) {
+            attackCardHTML = `
+                <div class="dh-weapon-card dh-npc-weapon-card dh-npc-missing-weapon" style="border-style: dashed; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #a0aec0; font-size: 0.85em;">Macro de Ataque não cadastrado</span>
+                    <button class="dh-add-missing-btn" id="dh-npc-add-attack-macro">+ Criar Macro de Ataque</button>
+                </div>
+            `;
+        }
+
+        // --- 3. SEÇÃO ATRIBUTOS ---
+        // Primeira linha: Dificuldade, Limiares, Vida (apenas máxima), Fadiga (apenas máxima)
+        const difHTML = npcStats.dificuldade.exists 
+            ? `<span class="dh-npc-attr-value">${npcStats.dificuldade.val}</span>`
+            : `<button class="dh-add-missing-btn" data-missing-npc-attr="dificuldade" data-default="18">+</button>`;
+
+        let limiaresHTML = '';
+        if (npcStats.limiares.exists) {
+            limiaresHTML = `<span class="dh-npc-attr-value">${npcStats.limiares.val}</span>`;
+        } else if (defenses.menor?.exists && defenses.maior?.exists) {
+            limiaresHTML = `<span class="dh-npc-attr-value">${defenses.menor.val} / ${defenses.maior.val}</span>`;
+        } else if (defenses.menor?.exists) {
+            limiaresHTML = `<span class="dh-npc-attr-value">${defenses.menor.val} / <button class="dh-add-missing-btn" data-missing-def="maior" title="Adicionar Limiar-Maior">+</button></span>`;
+        } else if (defenses.maior?.exists) {
+            limiaresHTML = `<span class="dh-npc-attr-value"><button class="dh-add-missing-btn" data-missing-def="menor" title="Adicionar Limiar-Menor">+</button> / ${defenses.maior.val}</span>`;
+        } else {
+            limiaresHTML = `<div style="display:flex; gap:3px;"><button class="dh-add-missing-btn" data-missing-npc-attr="limiares" data-default="29/55" title="Adicionar Limiares">+</button></div>`;
+        }
+
+        const vidaHTML = trackersMap['vida']?.exists 
+            ? `<span class="dh-npc-attr-value">${vidaMax}</span>`
+            : `<button class="dh-add-missing-btn" data-missing-npc-tracker="vida" data-default="8">+</button>`;
+
+        const fadigaHTML = trackersMap['fadiga']?.exists 
+            ? `<span class="dh-npc-attr-value">${fadigaMax}</span>`
+            : `<button class="dh-add-missing-btn" data-missing-npc-tracker="fadiga" data-default="5">+</button>`;
+
+        let npcAttrsHTML = `
+            <div class="dh-section-title"><span>Atributos</span></div>
+            <div class="dh-npc-attrs-grid-4">
+                <div class="dh-npc-attr-item">
+                    <span class="dh-npc-attr-label">Dificuldade</span>
+                    ${difHTML}
+                </div>
+                <div class="dh-npc-attr-item">
+                    <span class="dh-npc-attr-label">Limiares</span>
+                    ${limiaresHTML}
+                </div>
+                <div class="dh-npc-attr-item">
+                    <span class="dh-npc-attr-label">Vida</span>
+                    ${vidaHTML}
+                </div>
+                <div class="dh-npc-attr-item">
+                    <span class="dh-npc-attr-label">Fadiga</span>
+                    ${fadigaHTML}
+                </div>
+            </div>
+            <div class="dh-npc-weapon-row">${attackCardHTML}</div>
+        `;
+
+        // --- 4. SEÇÃO EXPERIÊNCIAS ---
+        let npcExpSectionHTML = `
+            <div class="dh-section-title">
+                <span>Experiências</span>
+                <button class="dh-add-btn" id="dh-npc-add-exp" title="Adicionar Experiência">+</button>
+            </div>
+            <div class="dh-npc-experiences-grid" id="dh-npc-experiences-container">
+                ${expCount > 0 ? expCardsHTML : '<span style="color: #718096; font-size: 0.8em; padding: 4px;">Nenhuma experiência cadastrada.</span>'}
+            </div>
+        `;
+
+        // --- 5. SEÇÃO HABILIDADES ---
+        let npcAbilitiesSectionHTML = `
+            <div class="dh-section-title">
+                <span>Habilidades</span>
+                <button class="dh-add-btn" id="dh-npc-add-hab" title="Adicionar Habilidade">+</button>
+            </div>
+            <div class="dh-npc-abilities-list" id="dh-npc-abilities-container">
+                ${abilityCardsHTML || '<div style="color: #718096; font-size: 0.8em; padding: 6px 0;">Nenhuma habilidade cadastrada. Clique no + acima para adicionar.</div>'}
+            </div>
+        `;
+
+        root.innerHTML = npcHeaderHTML + npcAttrsHTML + npcExpSectionHTML + npcAbilitiesSectionHTML;
+
+        // --- Listeners do NPC ---
+        // Rolagem da arma
+        const npcWeaponCard = root.querySelector('.dh-npc-weapon-card:not(.dh-npc-missing-weapon)');
+        if (npcWeaponCard) {
+            npcWeaponCard.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return;
+                const fullName = npcWeaponCard.getAttribute('data-card-fullname');
+                triggerRollForAbilityName(doc, fullName);
+            });
+        }
+
+        // Rolagem de experiências
+        const npcExpContainer = root.querySelector('#dh-npc-experiences-container');
+        if (npcExpContainer) {
+            npcExpContainer.querySelectorAll('.dh-exp-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const fullName = card.getAttribute('data-card-fullname');
+                    triggerRollForAbilityName(doc, fullName);
+                });
+            });
+        }
+
+        // Rolagem de habilidades
+        const npcAbilitiesContainer = root.querySelector('#dh-npc-abilities-container');
+        if (npcAbilitiesContainer) {
+            npcAbilitiesContainer.querySelectorAll('.dh-npc-ability-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const fullName = card.getAttribute('data-card-fullname');
+                    triggerRollForAbilityName(doc, fullName);
+                });
+            });
+        }
+
+        // Botões de atributos ausentes do NPC
+        root.querySelectorAll('[data-missing-npc-attr]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const attrName = btn.getAttribute('data-missing-npc-attr');
+                const defaultVal = btn.getAttribute('data-default') || "0";
+                const properName = attrName.charAt(0).toUpperCase() + attrName.slice(1);
+                addNewAttributeToRoll20(doc, properName, `Valor para ${properName}:`, defaultVal, false);
+            });
+        });
+
+        // Botões de trackers ausentes (Vida / Fadiga)
+        root.querySelectorAll('[data-missing-npc-tracker]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const trackerName = btn.getAttribute('data-missing-npc-tracker');
+                const defaultVal = btn.getAttribute('data-default') || "6";
+                const properName = trackerName.charAt(0).toUpperCase() + trackerName.slice(1);
+                addNewAttributeToRoll20(doc, properName, `Valor máximo de ${properName}:`, defaultVal, true);
+            });
+        });
+
+        // Botões de defesas ausentes (Limiar-Menor / Limiar-Maior)
+        root.querySelectorAll('[data-missing-def]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const defKey = btn.getAttribute('data-missing-def');
+                let attrName = "Limiar-Menor";
+                let defaultVal = "5";
+                if (defKey === 'maior') { attrName = "Limiar-Maior"; defaultVal = "10"; }
+                addNewAttributeToRoll20(doc, attrName, `Valor inicial para ${attrName}:`, defaultVal, false);
+            });
+        });
+
+        // Botão para criar Macro de Ataque
+        const addNpcAttackBtn = root.querySelector('#dh-npc-add-attack-macro');
+        if (addNpcAttackBtn) {
+            addNpcAttackBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addNewMacroToRoll20(doc, 'ataque', null, 'Ataque');
+            });
+        }
+
+        // Botão para criar nova Experiência
+        const addNpcExpBtn = root.querySelector('#dh-npc-add-exp');
+        if (addNpcExpBtn) {
+            addNpcExpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addNewMacroToRoll20(doc, 'exp', 'Nome da nova Experiência:');
+            });
+        }
+
+        // Botão para criar nova Habilidade
+        const addNpcHabBtn = root.querySelector('#dh-npc-add-hab');
+        if (addNpcHabBtn) {
+            addNpcHabBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addNewMacroToRoll20(doc, 'hab', 'Nome da nova Habilidade:');
+            });
+        }
+
+        return; // Skip normal player sheet rendering
+    }
+    // ========== END NPC SHEET RENDERING ==========
+
+    // ========== CHOICE SCREEN (IF NEITHER NPC NOR PC) ==========
+    if (!isPc) {
+        const headerMeta = doc.querySelector('.dh-header-meta');
+        if (headerMeta) {
+            headerMeta.style.display = 'none';
+        }
+
+        root.innerHTML = `
+            <div class="dh-choice-container">
+                <div class="dh-choice-title">Configurar Ficha PinkDagger</div>
+                <div class="dh-choice-subtitle">Esta ficha ainda não foi configurada. Selecione abaixo se ela representa um Personagem de Jogador (PC) ou uma Criatura / Monstro (NPC):</div>
+                <div class="dh-choice-grid">
+                    <div class="dh-choice-card" id="dh-choose-pc-card">
+                        <div class="dh-choice-icon">🛡️</div>
+                        <div class="dh-choice-card-title">Personagem de Jogador (PC)</div>
+                        <div class="dh-choice-card-desc">Ficha completa de herói com Atributos Principais, Rastreadores (Vida, Fadiga, Armadura, Esperança), Armas, Heranças, Classes, Domínio e Inventário.</div>
+                        <button type="button" class="dh-choice-action-btn">Criar como Jogador (PC)</button>
+                    </div>
+                    <div class="dh-choice-card" id="dh-choose-npc-card">
+                        <div class="dh-choice-icon">🐉</div>
+                        <div class="dh-choice-card-title">Criatura / Monstro (NPC)</div>
+                        <div class="dh-choice-card-desc">Ficha simplificada para o mestre com Dificuldade, Limiares, Vida, Fadiga, Bônus de Ataque, Dano, Experiências e lista de Habilidades.</div>
+                        <button type="button" class="dh-choice-action-btn">Criar como Monstro (NPC)</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        root.querySelector('#dh-choose-pc-card')?.addEventListener('click', () => {
+            addNewAttributeToRoll20(doc, 'pinkdagger_pc', null, '1', false, false, true);
+        });
+
+        root.querySelector('#dh-choose-npc-card')?.addEventListener('click', () => {
+            openImportNpcModal(doc);
+        });
+
+        return; // Aguarda a escolha do usuário
+    }
+
+    // ========== PLAYER (PC) SHEET RENDERING ==========
+    const headerMeta = doc.querySelector('.dh-header-meta');
+    if (headerMeta) {
+        headerMeta.style.display = 'flex';
+    }
 
     const nivelElem = doc.getElementById('dh-char-nivel');
     const profElem = doc.getElementById('dh-char-prof');

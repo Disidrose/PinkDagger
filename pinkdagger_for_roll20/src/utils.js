@@ -98,3 +98,21 @@ function formatDamageFormula(damageText, profVal) {
     return clean || '-';
 }
 
+function resolveMacroVariables(text, attrMap = {}) {
+    if (!text) return '';
+    let result = text;
+    // Substitui variáveis do Roll20 @{nome}
+    result = result.replace(/@\{([^}]+)\}/gi, (match, attrName) => {
+        const cleanKey = attrName.trim().toLowerCase();
+        if (attrMap[cleanKey] !== undefined && attrMap[cleanKey] !== null && attrMap[cleanKey] !== '') {
+            return attrMap[cleanKey];
+        }
+        return '';
+    });
+    // Remove os colchetes inline roll [[ e ]]
+    result = result.replace(/\[\[/g, '').replace(/\]\]/g, '');
+    // Limpa espaços duplicados
+    result = result.replace(/\s+/g, ' ').trim();
+    return result;
+}
+

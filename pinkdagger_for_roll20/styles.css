@@ -321,6 +321,27 @@
     line-height: 1.4;
 }
 
+/* Modal de Importação de NPC */
+.dh-import-npc-modal-box {
+    max-width: 640px;
+}
+
+.dh-import-textarea {
+    min-height: 260px;
+    color: #e2e8f0;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 0.8em;
+}
+
+.dh-import-npc-modal-box kbd {
+    background: #12141c;
+    border: 1px solid #3c4252;
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 0.9em;
+    color: #f1c40f;
+}
+
 .dh-modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -1095,4 +1116,229 @@
     color: #f1c40f;
     margin-right: 8px;
     font-size: 0.75em;
+}
+
+
+/* ========== NPC SHEET STYLES ========== */
+
+.dh-npc-header-info {
+    margin-bottom: 14px;
+    padding: 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dh-npc-tier-tipo {
+    font-size: 1.05em;
+    font-weight: 800;
+    color: #E85D9E;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.dh-npc-desc {
+    font-size: 0.88em;
+    color: #cbd5e0;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    font-style: italic;
+}
+
+.dh-npc-tactics {
+    font-size: 0.86em;
+    color: #cbd5e0;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    background: #171a23;
+    border-left: 3px solid #f1c40f;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.dh-npc-tactics-label {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
+/* Grid de Atributos do NPC: 4 colunas na primeira linha */
+.dh-npc-attrs-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dh-npc-attr-item {
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dh-npc-attr-label {
+    font-size: 0.75em;
+    color: #a0aec0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-npc-attr-value {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+/* Segunda linha da seção Atributos: Botão da arma ocupando a linha inteira */
+.dh-npc-weapon-row {
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.dh-npc-weapon-card {
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* Seção Habilidades do NPC: 1 por linha (largura total) */
+.dh-npc-abilities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.dh-npc-ability-card {
+    width: 100%;
+    box-sizing: border-box;
+    border-top-color: #9b59b6;
+    cursor: pointer;
+}
+
+.dh-npc-ability-card .dh-heritage-tag {
+    color: #9b59b6;
+}
+
+.dh-npc-ability-card:hover {
+    border-top-color: #f1c40f;
+}
+
+.dh-npc-missing-weapon {
+    border: 1px dashed #4a5568 !important;
+    background: #171a23 !important;
+    cursor: default !important;
+}
+
+/* Grid de Experiências do NPC */
+.dh-npc-experiences-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+/* ========== CHOICE SCREEN STYLES (PC vs NPC) ========== */
+.dh-choice-container {
+    padding: 30px 20px;
+    text-align: center;
+    background: #171a23;
+    border: 2px dashed #3c4252;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.dh-choice-title {
+    font-size: 1.3em;
+    font-weight: 800;
+    color: #E85D9E;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.dh-choice-subtitle {
+    font-size: 0.9em;
+    color: #cbd5e0;
+    margin-bottom: 24px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+}
+
+.dh-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.dh-choice-card {
+    background: #1b1f2b;
+    border: 2px solid #3c4252;
+    border-radius: 8px;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dh-choice-card:hover {
+    border-color: #E85D9E;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(232, 93, 158, 0.25);
+    background: #232838;
+}
+
+.dh-choice-icon {
+    font-size: 2.6rem;
+    line-height: 1;
+}
+
+.dh-choice-card-title {
+    font-size: 1.05em;
+    font-weight: 800;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dh-choice-card-desc {
+    font-size: 0.82em;
+    color: #a0aec0;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.dh-choice-action-btn {
+    background: #E85D9E;
+    color: #12141c;
+    border: none;
+    font-weight: 800;
+    font-size: 0.85em;
+    padding: 8px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.dh-choice-card:hover .dh-choice-action-btn {
+    background: #ff75b5;
+    transform: scale(1.02);
 }
