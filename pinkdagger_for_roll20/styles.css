@@ -1119,6 +1119,94 @@
 }
 
 
+/* ========== FEAR SHEET STYLES ========== */
+
+.dh-fear-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 10px;
+    background: #1b1f2b;
+    border: 1px solid #3c4252;
+    border-radius: 8px;
+}
+
+.dh-fear-label {
+    font-size: 1.1em;
+    font-weight: 800;
+    color: #E85D9E;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.dh-fear-controls {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.dh-fear-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #E85D9E;
+    background: #171a23;
+    color: #E85D9E;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dh-fear-btn:hover {
+    background: #E85D9E;
+    color: #171a23;
+    transform: scale(1.08);
+}
+
+.dh-fear-value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 90px;
+    justify-content: center;
+}
+
+#dh-fear-val {
+    font-size: 2.6em;
+    font-weight: 800;
+    color: #f1c40f;
+}
+
+.dh-fear-max {
+    font-size: 1em;
+    color: #a0aec0;
+    font-weight: bold;
+}
+
+.dh-fear-pips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.dh-fear-pip {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #8e44ad;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.dh-fear-pip-filled {
+    background: #8e44ad;
+    box-shadow: 0 0 6px rgba(142, 68, 173, 0.8);
+}
+
 /* ========== NPC SHEET STYLES ========== */
 
 .dh-npc-header-info {

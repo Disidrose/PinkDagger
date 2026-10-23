@@ -67,6 +67,85 @@ function setupDefenseControl(doc, root, key, defObj, possibleNames) {
     }
 }
 
+function renderFearSheet(doc, root, medoStats) {
+    const headerMeta = doc.querySelector('.dh-header-meta');
+    if (headerMeta) {
+        headerMeta.style.display = 'none';
+    }
+
+    if (!medoStats.exists) {
+        root.innerHTML = `
+            <div class="dh-fear-container">
+                <div class="dh-fear-label">Medo</div>
+                <button class="dh-add-missing-btn" id="dh-fear-create-attr">+ Criar atributo Medo</button>
+            </div>
+        `;
+        root.querySelector('#dh-fear-create-attr')?.addEventListener('click', () => {
+            addNewAttributeToRoll20(doc, 'Medo', null, '0', false, false, true);
+        });
+        return;
+    }
+
+    const maxVal = medoStats.max || FEAR_DEFAULT_MAX;
+    let currentVal = Math.min(Math.max(medoStats.val, 0), maxVal);
+
+    root.innerHTML = `
+        <div class="dh-fear-container">
+            <div class="dh-fear-label">Medo</div>
+            <div class="dh-fear-controls">
+                <button type="button" class="dh-fear-btn" id="dh-fear-down" title="Gastar Medo">−</button>
+                <div class="dh-fear-value"><span id="dh-fear-val">${currentVal}</span><span class="dh-fear-max">/ ${maxVal}</span></div>
+                <button type="button" class="dh-fear-btn" id="dh-fear-up" title="Ganhar Medo">+</button>
+            </div>
+            <div class="dh-fear-pips" id="dh-fear-pips"></div>
+        </div>
+    `;
+
+    const valElem = root.querySelector('#dh-fear-val');
+    const pipsElem = root.querySelector('#dh-fear-pips');
+    const renderPips = () => {
+        let pipsHTML = '';
+        for (let i = 1; i <= maxVal; i++) {
+            pipsHTML += `<span class="dh-fear-pip${i <= currentVal ? ' dh-fear-pip-filled' : ''}"></span>`;
+        }
+        pipsElem.innerHTML = pipsHTML;
+    };
+    renderPips();
+
+    let busy = false;
+    const changeFear = async (delta, macro) => {
+        if (busy) return;
+        const newVal = currentVal + delta;
+        if (newVal < 0 || newVal > maxVal) return;
+
+        busy = true;
+        currentVal = newVal;
+        valElem.innerText = currentVal;
+        renderPips();
+
+        // Busca o campo novamente: o Roll20 recria a linha do atributo e a referência antiga fica solta
+        const targetInput = findAttributeInput(doc, [medoStats.attrName.toLowerCase()]) || medoStats.input;
+        if (targetInput) updateOriginalInput(targetInput, currentVal);
+
+        // Aguarda o Roll20 registrar o novo valor antes de o macro ler @{medo}
+        await delay(300);
+        await ensureMacroAndTrigger(doc, macro.name, macro.action(medoStats.attrName));
+        busy = false;
+    };
+
+    root.querySelector('#dh-fear-down')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        changeFear(-1, FEAR_MACROS.menos);
+    });
+
+    root.querySelector('#dh-fear-up')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        changeFear(1, FEAR_MACROS.mais);
+    });
+}
+
 function populateDaggerheartData(doc) {
     const root = doc.getElementById('dh-content-root');
     if (!root) return;
@@ -95,6 +174,8 @@ function populateDaggerheartData(doc) {
     let profVal = null;
     let isNpc = false;
     let isPc = false;
+    let isFear = false;
+    let medoStats = { val: 0, max: null, input: null, attrName: 'medo', exists: false };
     let npcStats = { 
         dificuldade: { val: '-', exists: false }, 
         atq: { val: '-', exists: false }, 
@@ -150,6 +231,16 @@ function populateDaggerheartData(doc) {
             isNpc = true;
         } else if (lowerName === 'pinkdagger_pc') {
             isPc = true;
+        } else if (lowerName === 'pinkdagger_fear') {
+            isFear = true;
+        } else if (lowerName === 'medo') {
+            medoStats = {
+                val: parseInt(currentVal, 10) || 0,
+                max: parseInt(maxVal, 10) || null,
+                input: currentInput,
+                attrName: name,
+                exists: true
+            };
         } else if (lowerName === 'dificuldade') {
             npcStats.dificuldade = { val: currentVal, exists: true };
         } else if (lowerName === 'limiares' || lowerName === 'limiar') {
@@ -181,6 +272,12 @@ function populateDaggerheartData(doc) {
             unmappedStats.push({ name, current: currentVal, max: maxVal, originalInput: currentInput });
         }
     });
+
+    // ========== FEAR SHEET RENDERING ==========
+    if (isFear) {
+        renderFearSheet(doc, root, medoStats);
+        return;
+    }
 
     // ========== NPC SHEET RENDERING ==========
     if (isNpc) {

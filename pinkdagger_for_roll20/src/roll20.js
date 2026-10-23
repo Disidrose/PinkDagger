@@ -1,8 +1,13 @@
 function updateOriginalInput(originalInput, newValue) {
     if (!originalInput) return;
+    // O campo fica numa aba oculta e nunca recebe foco, então .blur() sozinho não dispara nada;
+    // os eventos de perda de foco são disparados manualmente para o Roll20 salvar o valor
+    originalInput.focus();
     originalInput.value = newValue;
     originalInput.dispatchEvent(new Event('input', { bubbles: true }));
     originalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    originalInput.dispatchEvent(new FocusEvent('blur'));
+    originalInput.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
     originalInput.blur();
 }
 
@@ -248,6 +253,63 @@ function addNewAttributeToRoll20(doc, attrName, promptMessage, defaultVal = "0",
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function abilityExistsInRoll20(doc, abilName) {
+    const target = abilName.trim().toLowerCase();
+    return Array.from(doc.querySelectorAll('.attributesabilities .abilities .abil')).some(abil => {
+        const name = abil.querySelector('.abilname')?.innerText?.trim() || (abil.querySelector('.abilname input')?.value?.trim() || '');
+        return name.toLowerCase() === target;
+    });
+}
+
+// Executa o macro; se ele ainda não existir na aba nativa, cria antes de executar
+async function ensureMacroAndTrigger(doc, abilName, abilAction) {
+    if (!abilityExistsInRoll20(doc, abilName)) {
+        const navTabs = doc.querySelector('.nav.nav-tabs');
+        const attrTabNav = navTabs?.querySelector('a[data-tab="attributesabilities"]');
+        const pinkDaggerNav = navTabs?.querySelector('a[data-tab="daggerheart"]');
+        const addAbilBtn = doc.querySelector('.attributesabilities .addabil') || doc.querySelector('.addabil');
+        if (!attrTabNav || !addAbilBtn) return;
+
+        attrTabNav.click();
+        await delay(150);
+        addAbilBtn.click();
+        await delay(200);
+
+        const abils = doc.querySelectorAll('.attributesabilities .abilities .abil');
+        const newAbil = abils[abils.length - 1];
+        if (newAbil) {
+            const editBtn = newAbil.querySelector('.editabil');
+            if (editBtn) editBtn.click();
+            await delay(150);
+
+            const nameInput = newAbil.querySelector('.abilname input') || newAbil.querySelector('input.abilname');
+            const macroTextarea = newAbil.querySelector('textarea.action') || newAbil.querySelector('textarea');
+
+            if (nameInput) {
+                nameInput.value = abilName;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                nameInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+            if (macroTextarea) {
+                macroTextarea.value = abilAction;
+                macroTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                macroTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+                macroTextarea.dispatchEvent(new Event('blur', { bubbles: true }));
+            }
+
+            const saveBtn = newAbil.querySelector('.saveabil');
+            if (saveBtn) saveBtn.click();
+            await delay(200);
+        }
+
+        if (pinkDaggerNav) pinkDaggerNav.click();
+        await delay(150);
+    }
+
+    triggerRollForAbilityName(doc, abilName);
 }
 
 async function importNpcBatchToRoll20(doc, parsedData, onProgress) {

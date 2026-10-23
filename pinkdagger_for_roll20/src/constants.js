@@ -13,6 +13,19 @@ const MACRO_TEMPLATES = {
     hab: `&{template:default} {{name=Nome da Habilidade\n}} {{Efeito=O que a habilidade faz.\n}}`
 };
 
+// Macros da ficha de Medo (executadas após alterar o atributo, por isso o valor antigo é calculado a partir do novo)
+const FEAR_MACROS = {
+    menos: {
+        name: 'Menos-Medo',
+        action: (attr) => `&{template:default} {{name=😱 O Mestre gastou Medo\n}} {{Medo=[[@{${attr}}+1]] → [[@{${attr}}]]\n}}`
+    },
+    mais: {
+        name: 'Mais-Medo',
+        action: (attr) => `&{template:default} {{name=💀 O Mestre ganhou Medo\n}} {{Medo=[[@{${attr}}-1]] → [[@{${attr}}]]\n}}`
+    }
+};
+const FEAR_DEFAULT_MAX = 12;
+
 // Atributos principais e recursos/trackers fixos do sistema Daggerheart
 const FIXED_TRAITS = ['agilidade', 'força', 'acuidade', 'instinto', 'presença', 'conhecimento'];
 const FIXED_TRACKERS = ['vida', 'fadiga', 'armadura', 'esperança'];

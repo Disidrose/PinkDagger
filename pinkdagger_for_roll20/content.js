@@ -14,13 +14,29 @@
         doc.head.appendChild(linkEl);
     }
 
+    // A aba "Atributos e Habilidades" só existe para quem pode editar a ficha.
+    // O data-tab é interno do Roll20 e não muda com o idioma da interface.
+    function hasAttributesTab(navTabs) {
+        const attrTabNav = navTabs.querySelector('a[data-tab="attributesabilities"]');
+        if (!attrTabNav) return false;
+        const navItem = attrTabNav.closest('li') || attrTabNav;
+        return navItem.style.display !== 'none';
+    }
+
     function initDaggerheartTab(doc) {
         const navTabs = doc.querySelector('.nav.nav-tabs');
         const tabContent = doc.querySelector('#tab-content');
 
-        if (!navTabs || !tabContent || doc.querySelector('.daggerheart-nav-item')) {
+        if (!navTabs || !tabContent) return;
+
+        if (!hasAttributesTab(navTabs)) {
+            // Remove a aba caso a permissão de edição tenha sido retirada
+            doc.querySelector('.daggerheart-nav-item')?.remove();
+            tabContent.querySelector('.daggerheart.tab-pane')?.remove();
             return;
         }
+
+        if (doc.querySelector('.daggerheart-nav-item')) return;
 
         injectStyles(doc);
 
