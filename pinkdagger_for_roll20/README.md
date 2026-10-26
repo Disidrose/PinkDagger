@@ -160,26 +160,6 @@ Sempre que houver atualizações no repositório (novas versões ou correções 
 
 ---
 
-## 📂 Estrutura do Projeto
-
-```text
-pinkdagger_for_roll20/
-├── icons/               # Ícones da extensão em diferentes resoluções (16px, 48px, 128px)
-├── src/
-│   ├── constants.js     # Constantes globais, templates de macros e definições
-│   ├── utils.js         # Funções auxiliares (manipulação de strings, DOM e sanitização)
-│   ├── npcParser.js     # Parser inteligente de texto de PDF para blocos de PNJs
-│   ├── roll20.js        # Utilitários de comunicação com a API/DOM do Roll20
-│   ├── modals.js        # Modais interativos de edição, criação e importação
-│   └── sheet.js         # Lógica da interface, renderização da ficha e sincronização
-├── content.js           # Content Script principal que injeta a aba na interface do Roll20
-├── styles.css           # Estilos visuais personalizados e tema da interface PinkDagger
-├── manifest.json        # Configuração da extensão (Manifest V3)
-└── README.md            # Documentação do projeto
-```
-
----
-
 ## 🛠️ Solução de Problemas
 
 - **A aba PinkDagger não aparece na ficha do Roll20:**
